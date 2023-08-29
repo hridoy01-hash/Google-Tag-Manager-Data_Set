@@ -67,16 +67,25 @@ window.onload = () => {
                         // console.log("itemNamePathID", itemNamePathID);
 
                         const getItemData = await LoadDataFunction(`https://api.soppiya.com/v2.1/widget/item/info/${itemNamePathID}`);
-                        // console.log("getItemData for cart add", getItemData);
-
+                        console.log("getItemData for cart add", getItemData);
+                        let variations = " ";
+                        let flashPrice = " ";
+                        if (getItemData.variations) {
+                            variations = [...getItemData.variations];
+                            console.log("variation", variations);
+                        };
+                        if (getItemData.flashPrice) {
+                            flashPrice = getItemData.flashPrice;
+                        }
                         await handleCartAction("add", {
                             "type": "item",
                             "entityId": `${getItemData._id}`,
                             "name": `${getItemData.name}`,
                             "slug": `${getItemData.slug}`,
-                            "price": `${getItemData.price}`,
+                            "basePrice": `${getItemData.basePrice}`,
                             "quantity": 1,
-                            "flashPrice": `${getItemData.flashPrice}`,
+                            "flashPrice": `${flashPrice}`,
+                            "variations": `${variations}`
                         });
 
                         const cartData = await handleCartCompilation();
@@ -116,7 +125,7 @@ window.onload = () => {
 
                 }
 
-                // cart list google taq code
+                // Check Out start google taq code
                 const cartPage = window.location.href;
                 const checkCartPage = cartPage.includes("/cart");
                 if (checkCartPage) {
@@ -151,7 +160,7 @@ window.onload = () => {
                     _place_order__button_g1g69_60.addEventListener("click", async function () {
 
                         const cartData = await handleCartCompilation();
-                        console.log("cart page Cart All Item", cartData);
+                        console.log("Cart All Item", cartData);
                         dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
                         dataLayer.push({
                             event: "purchase",
@@ -161,6 +170,7 @@ window.onload = () => {
                                 items: [...cartData.details]
                             }
                         });
+
                     });
 
                 }
