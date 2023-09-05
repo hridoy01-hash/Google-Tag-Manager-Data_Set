@@ -30,9 +30,9 @@ window.onload = () => {
 
                     if (getItemData.flashPrice) {
                         const FlashPrice = getItemData.flashPrice;
-                        console.log("FlashPrice", FlashPrice);
+                        // console.log("FlashPrice", FlashPrice);
                         discount = basePrice - FlashPrice;
-                        console.log("discount", discount);
+                        // console.log("discount", discount);
                     }
 
                     let MainPrice = basePrice - discount;
@@ -68,7 +68,7 @@ window.onload = () => {
 
                         const getItemData = await LoadDataFunction(`https://api.soppiya.com/v2.1/widget/item/info/${itemNamePathID}`);
                         console.log("getItemData for cart add", getItemData);
-                        let variations = " ";
+                        /* let variations = " ";
                         let flashPrice = " ";
                         if (getItemData.variations) {
                             variations = [...getItemData.variations];
@@ -77,16 +77,18 @@ window.onload = () => {
                         if (getItemData.flashPrice) {
                             flashPrice = getItemData.flashPrice;
                         }
-                        await handleCartAction("add", {
-                            "type": "item",
-                            "entityId": `${getItemData._id}`,
-                            "name": `${getItemData.name}`,
-                            "slug": `${getItemData.slug}`,
-                            "basePrice": `${getItemData.basePrice}`,
-                            "quantity": 1,
-                            "flashPrice": `${flashPrice}`,
-                            "variations": `${variations}`
-                        });
+                         await handleCartAction("add", {
+                             "type": "item",
+                             "entityId": `${getItemData._id}`,
+                             "name": `${getItemData.name}`,
+                             "slug": `${getItemData.slug}`,
+                             "basePrice": `${getItemData.basePrice}`,
+                             "quantity": 1,
+                             "flashPrice": `${flashPrice}`,
+                             "variations": `${variations}`
+                         }); */
+
+
 
                         const cartData = await handleCartCompilation();
                         console.log("cartData", cartData.details);
@@ -133,7 +135,7 @@ window.onload = () => {
                     _checkout_button_170q6_31.addEventListener("click", async function () {
 
                         const cartData = await handleCartCompilation();
-                        console.log("cart page Cart All Item", cartData);
+                        // console.log("cart page Cart All Item", cartData);
 
                         dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
                         dataLayer.push({
@@ -161,15 +163,37 @@ window.onload = () => {
 
                         const cartData = await handleCartCompilation();
                         console.log("Cart All Item", cartData);
-                        dataLayer.push({ ecommerce: null });  // Clear the previous ecommerce object.
-                        dataLayer.push({
-                            event: "purchase",
-                            ecommerce: {
-                                value: `${cartData.summary.totalAmount}`,
-                                currency: "BDT",
-                                items: [...cartData.details]
+
+                        const storeCartData = [];
+                        storeCartData.push(cartData);
+                        console.log("before thank you page storeCartData", storeCartData);
+                       
+                        let myEventfunction = () => {
+                            const thankyou = window.location.href;
+                            const CheckThankyouPage = thankyou.includes("/thank-you");
+                            if (CheckThankyouPage) {
+                                console.log("thank you storeCartData", storeCartData);
+                                dataLayer.push({ ecommerce: null });
+                                dataLayer.push({
+                                    event: "purchase",
+                                    ecommerce: {
+                                        value: `${storeCartData[0].summary.totalAmount}`,
+                                        currency: "BDT",
+                                        items: [storeCartData[0]]
+                                    }
+                                });
+
                             }
-                        });
+                        }
+                        // link change watcher
+                        let previousHistory = '';
+                        setInterval(() => {
+                            if (window.location.href !== previousHistory) {
+                                previousHistory = window.location.href;
+                                myEventfunction();
+                            }
+                        }, 100);
+
 
                     });
 
